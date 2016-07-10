@@ -39,7 +39,8 @@ describe('Routine', function () {
 		}).then(done);
 	});
 
-	it('should support promise returning function that has been specified as the last action of the routine ', function (done) {
+	it('should support promise returning function that has been specified as ' +
+		'the last action of the routine ', function (done) {
 		Routine
 			.set({state})
 			.first(addOneToCount)
@@ -52,7 +53,8 @@ describe('Routine', function () {
 			.then(done);
 	});
 
-	it('should support promise returning function that has been specified as the first action of the routine ', function (done) {
+	it('should support promise returning function that has been specified as ' +
+		'the first action of the routine ', function (done) {
 		Routine
 			.set({state})
 			.then(asynchronouslyAddTwoToCount)

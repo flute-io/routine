@@ -38,6 +38,7 @@
     "css-loader": "^0.23.1",
     "enzyme": "^2.3.0",
     "eslint": "^2.8.0",
+    "eslint-plugin-mocha": "^4.0.0",
     "eslint-watch": "^2.1.10",
     "mocha": "2.3.4",
     "node-sass": "^3.7.0",
