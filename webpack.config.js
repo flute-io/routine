@@ -33,15 +33,7 @@ const common = {
 	module: {
 		loaders: [
 			{
-				test: /\.css$/,
-				loader: 'style-loader!css-loader!postcss-loader'
-			},
-			{
-				test: /\.scss$/,
-				loader: 'style-loader!css-loader!postcss-loader!sass-loader-once'
-			},
-			{
-				test: /(\.jsx|\.js)$/,
+				test: /(\.js)$/,
 				loader: 'babel',
 				exclude: /(node_modules|bower_components)/
 			}
