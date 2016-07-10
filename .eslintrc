@@ -19,6 +19,7 @@
     "window": false,
     "describe": true,
     "before": true,
+    "beforeEach": true,
     "it": true,
     "expect": true,
     "sinon": true
@@ -31,7 +32,9 @@
     "ecmaFeatures": {}
   },
 
-  "plugins": [],
+  "plugins": [
+    "mocha"
+  ],
 
   "extends": [
     "eslint:recommended"
