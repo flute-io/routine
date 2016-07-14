@@ -1,14 +1,16 @@
+export {ensureThat} from './EnsureThat';
+
 export default class Routine {
 
 	aborted = false;
 
-	actions = [];
+	operations = [];
 
 	handlers = {};
 
 	errorHandler = undefined;
 
-	currentAction = undefined;
+	currentOperation = undefined;
 
 	static set (scope) {
 		return new Routine(scope);
@@ -16,35 +18,52 @@ export default class Routine {
 
 	constructor (scope) {
 		this.scope = scope;
+
+		scope.routine = this;
 	}
 
-	addAction (action) {
-		this.actions.push((arg)=> {
+	addOperation (operation) {
+
+		let func;
+
+		if (isRunnable(operation)) {
+			func = () => {
+				return operation.run(this);
+			};
+		}
+		else {
+			func = (arg) => {
+				this.currentOperation = operation;
+				return operation.call(this.scope, arg);
+			};
+		}
+
+		this.operations.push((arg)=> {
 			if (!this.aborted) {
-				this.currentAction = action;
-				return action.call(this.scope, arg);
+				return func(arg);
 			}
 		});
+
 		return this;
 	}
 
-	first (action) {
-		this.addAction(action);
+	first (operation) {
+		this.addOperation(operation);
 		return this;
 	}
 
-	then (action) {
-		this.addAction(action);
+	then (operation) {
+		this.addOperation(operation);
 		return this;
 	}
 
-	onError (action) {
-		this.errorHandler = action;
+	onError (operation) {
+		this.errorHandler = operation;
 		return this;
 	}
 
-	on (eventName, action) {
-		this.handlers[eventName] = action;
+	on (eventName, operation) {
+		this.handlers[eventName] = operation;
 		return this;
 	}
 
@@ -56,17 +75,21 @@ export default class Routine {
 		return this;
 	}
 
+	abort () {
+		this.aborted = true;
+	}
+
 	run () {
 		let lastResult;
 
 		try {
-			for (let i = 0; i < this.actions.length; i++) {
-				let action = this.actions[i];
-				lastResult = action(lastResult);
+			for (let i = 0; i < this.operations.length; i++) {
+				let operation = this.operations[i];
+				lastResult = operation(lastResult);
 
 				if (lastResult instanceof Promise) {
-					const actionsToPromisify = this.actions.slice(i + 1, this.actions.length);
-					return runAsynchronously(this, actionsToPromisify, lastResult);
+					const operationsToPromisify = this.operations.slice(i + 1, this.operations.length);
+					return runAsynchronously(this, operationsToPromisify, lastResult);
 				}
 			}
 
@@ -78,23 +101,23 @@ export default class Routine {
 	}
 }
 
-function runAsynchronously (routine, actions, lastResult) {
+function runAsynchronously (routine, operations, lastResult) {
 	let promise = Promise.resolve(lastResult);
 
-	for (let action of actions) {
-		promise = promise.then(action);
+	for (let operation of operations) {
+		promise = promise.then(operation);
 	}
 
 	promise = promise.catch(error => {
 		if (routine.handlers.error) {
-			routine.aborted = true;
-			setTimeout(()=> {
+			routine.abort();
+			return new Promise(resolve => {
 				invokeErrorHandlerOn(routine, error);
+				resolve();
 			});
 		}
-		else {
-			return Promise.reject(error);
-		}
+
+		return Promise.reject(error);
 	});
 
 	return promise;
@@ -103,10 +126,14 @@ function runAsynchronously (routine, actions, lastResult) {
 function invokeErrorHandlerOn (routine, error) {
 	error.$state = routine.scope.state;
 	error.$invocation = {
-		action: routine.currentAction.name
+		operation: routine.currentOperation.name
 	};
 
 	if (routine.handlers.error) {
 		routine.handlers.error(error);
 	}
+}
+
+function isRunnable (operation) {
+	return typeof operation === 'object' && operation.run !== undefined;
 }
