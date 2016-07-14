@@ -4,7 +4,7 @@
   "description": "WIP",
   "main": "lib/render.js",
   "scripts": {
-    "build": "webpack --mode=build",
+    "build": "npm run lint && webpack --mode=build",
     "dev": "webpack --progress --colors --watch --mode=dev",
     "test": "mocha --compilers js:babel-register --colors ./test/*.spec.js",
     "test:w": "mocha --compilers js:babel-register --colors -w ./test/*.spec.js",

@@ -1,8 +1,14 @@
 export default class Routine {
 
+	aborted = false;
+
 	actions = [];
 
-	lastResult = undefined;
+	handlers = {};
+
+	errorHandler = undefined;
+
+	currentAction = undefined;
 
 	static set (scope) {
 		return new Routine(scope);
@@ -13,7 +19,13 @@ export default class Routine {
 	}
 
 	addAction (action) {
-		this.actions.push(action);
+		this.actions.push((arg)=> {
+			if (!this.aborted) {
+				this.currentAction = action;
+				return action.call(this.scope, arg);
+			}
+		});
+		return this;
 	}
 
 	first (action) {
@@ -26,34 +38,75 @@ export default class Routine {
 		return this;
 	}
 
+	onError (action) {
+		this.errorHandler = action;
+		return this;
+	}
+
+	on (eventName, action) {
+		this.handlers[eventName] = action;
+		return this;
+	}
+
+	get and () {
+		return this;
+	}
+
+	get but () {
+		return this;
+	}
+
 	run () {
-		const scope = this.scope;
-		let action, lastResult, i = 0;
+		let lastResult;
 
-		for (i; i < this.actions.length; i++) {
+		try {
+			for (let i = 0; i < this.actions.length; i++) {
+				let action = this.actions[i];
+				lastResult = action(lastResult);
 
-			action = this.actions[i];
-
-			lastResult = action.call(this.scope, this.lastResult);
-
-			if (lastResult instanceof Promise) {
-				const promise = lastResult;
-				const actionsToPromisify = this.actions.slice(i + 1, this.actions.length);
-
-				promise.then(() => {
-					return lastResult;
-				});
-
-				for (let action of actionsToPromisify) {
-					promise.then((arg) => {
-						return action.call(scope, arg);
-					});
+				if (lastResult instanceof Promise) {
+					const actionsToPromisify = this.actions.slice(i + 1, this.actions.length);
+					return runAsynchronously(this, actionsToPromisify, lastResult);
 				}
-
-				return promise;
 			}
-		}
 
-		return lastResult;
+			return lastResult;
+		}
+		catch (error) {
+			invokeErrorHandlerOn(this, error);
+		}
+	}
+}
+
+function runAsynchronously (routine, actions, lastResult) {
+	let promise = Promise.resolve(lastResult);
+
+	for (let action of actions) {
+		promise = promise.then(action);
+	}
+
+	promise = promise.catch(error => {
+		if (routine.handlers.error) {
+			routine.aborted = true;
+			setTimeout(()=> {
+				invokeErrorHandlerOn(routine, error);
+			});
+		}
+		else {
+			return Promise.reject(error);
+		}
+	});
+
+	return promise;
+}
+
+function invokeErrorHandlerOn (routine, error) {
+	error.$state = routine.scope.state;
+	error.$invocation = {
+		action: routine.currentAction.name
+	};
+
+	if (routine.handlers.error) {
+		routine.handlers.error(error);
 	}
 }
