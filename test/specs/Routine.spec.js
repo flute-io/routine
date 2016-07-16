@@ -1,6 +1,6 @@
 /* global describe, it, beforeEach */
 
-import Routine from '../../lib/Routine';
+import Routine from '../../src/Routine';
 import {expect, assert} from 'chai';
 
 import {
