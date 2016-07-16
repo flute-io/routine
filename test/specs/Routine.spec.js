@@ -1,25 +1,35 @@
 /* global describe, it, beforeEach */
 
-import Routine from '../lib/Routine';
+import Routine from '../../lib/Routine';
 import {expect, assert} from 'chai';
+
+import {
+
+	getState,
+	addToCount,
+	asynchronouslyAddToCount,
+	asynchronouslyDoSomethingThatThrowsAnError,
+	subtractFromCount,
+	doSomethingThatThrowsAnError,
+	doNothing
+
+} from './../helpers';
 
 describe('Routine', function () {
 
 	let state;
 
 	beforeEach(function () {
-		state = {
-			count: 0
-		};
+		state = getState();
 	});
 
 	it('should allow for setting up a routine that consists of ordered stateful function calls', function () {
 
 		Routine
 			.set({state})
-			.then(addOneToCount)
-			.then(addThreeToCount)
-			.then(subtractOneFromCount)
+			.then(addToCount(1))
+			.then(addToCount(3))
+			.then(subtractFromCount(1))
 			.run();
 
 		expect(state).to.eql({count: 3});
@@ -30,10 +40,10 @@ describe('Routine', function () {
 		it('should also support functions that return promises alongside regular functions', function (done) {
 			const promise = Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(addThreeToCount)
-				.then(asynchronouslyAddTwoToCount)
-				.then(subtractOneFromCount)
+				.then(addToCount(1))
+				.then(addToCount(3))
+				.then(asynchronouslyAddToCount(2))
+				.then(subtractFromCount(1))
 				.run();
 
 			expect(promise).to.be.instanceOf(Promise);
@@ -47,9 +57,9 @@ describe('Routine', function () {
 			'the last action of the routine ', function (done) {
 			Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(addThreeToCount)
-				.then(asynchronouslyAddTwoToCount)
+				.then(addToCount(1))
+				.then(addToCount(3))
+				.then(asynchronouslyAddToCount(2))
 				.run()
 				.then(()=> {
 					expect(state).to.eql({count: 6});
@@ -61,9 +71,9 @@ describe('Routine', function () {
 			'the first action of the routine ', function (done) {
 			Routine
 				.set({state})
-				.then(asynchronouslyAddTwoToCount)
-				.then(addOneToCount)
-				.then(addThreeToCount)
+				.then(asynchronouslyAddToCount(2))
+				.then(addToCount(1))
+				.then(addToCount(3))
 				.run()
 				.then(()=> {
 					expect(state).to.eql({count: 6});
@@ -79,9 +89,9 @@ describe('Routine', function () {
 
 			Routine
 				.set({state})
-				.then(addOneToCount)
+				.then(addToCount(1))
 				.then(doSomethingThatThrowsAnError)
-				.then(subtractOneFromCount)
+				.then(subtractFromCount(1))
 				.but.on('error', (error)=> {
 					expect(error).to.be.instanceOf(Error);
 					expect(state).to.eql({count: 1});
@@ -94,10 +104,10 @@ describe('Routine', function () {
 
 			Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(asynchronouslyAddTwoToCount)
+				.then(addToCount(1))
+				.then(asynchronouslyAddToCount(2))
 				.then(doSomethingThatThrowsAnError)
-				.then(subtractOneFromCount)
+				.then(subtractFromCount(1))
 				.but.on('error', (error)=> {
 					expect(error).to.be.instanceOf(Error);
 					expect(state).to.eql({count: 3});
@@ -110,10 +120,10 @@ describe('Routine', function () {
 
 			Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(asynchronouslyAddTwoToCount)
+				.then(addToCount(1))
+				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
-				.then(subtractOneFromCount)
+				.then(subtractFromCount(1))
 				.but.on('error', (error)=> {
 					expect(error).to.be.instanceOf(Error);
 					expect(state).to.eql({count: 3});
@@ -126,19 +136,20 @@ describe('Routine', function () {
 
 			Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(asynchronouslyAddTwoToCount)
+				.then(addToCount(1))
+				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
-				.then(subtractOneFromCount)
+				.then(subtractFromCount(1))
 				.but.on('error', (error)=> {
 					expect(error).to.be.instanceOf(Error);
 					expect(error.$state).to.eql({count: 3});
 					expect(error.$invocation).to.eql({
-						action: 'asynchronouslyDoSomethingThatThrowsAnError'
+						operation: 'asynchronouslyDoSomethingThatThrowsAnError'
 					});
 					done();
 				})
-				.run();
+				.run()
+				.catch(done);
 		});
 
 		it('should not report any native promise errors when an error handler ' +
@@ -146,29 +157,25 @@ describe('Routine', function () {
 
 			Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(asynchronouslyAddTwoToCount)
+				.then(addToCount(1))
+				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
-				.then(subtractOneFromCount)
+				.then(subtractFromCount(1))
 				.but.on('error', doNothing)
 				.run()
 				.catch(error => {
-					setTimeout(()=> {
-						assert.fail(error, undefined, 'Error should not have been thrown');
-					});
+					assert.fail(error, undefined, 'Error should not have been thrown');
 				});
 
 			Routine
 				.set({state})
-				.then(addOneToCount)
-				.then(asynchronouslyAddTwoToCount)
+				.then(addToCount(1))
+				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
-				.then(subtractOneFromCount)
+				.then(subtractFromCount(1))
 				.run()
 				.catch(error => {
-					setTimeout(()=> {
-						expect(error).to.be.instanceOf(Error);
-					});
+					expect(error).to.be.instanceOf(Error);
 				});
 
 			setTimeout(()=> {
@@ -176,41 +183,5 @@ describe('Routine', function () {
 			}, 500);
 		});
 	});
+
 });
-
-function addOneToCount () {
-	this.state.count++;
-}
-
-function addThreeToCount () {
-	this.state.count = this.state.count + 3;
-}
-
-function subtractOneFromCount () {
-	this.state.count = this.state.count - 1;
-}
-
-function asynchronouslyAddTwoToCount (args) {
-	const state = this.state;
-	return Promise
-		.resolve()
-		.then(()=> {
-			state.count = state.count + 2;
-		});
-}
-
-function doSomethingThatThrowsAnError () {
-	throw new Error('something went wrong');
-}
-
-function asynchronouslyDoSomethingThatThrowsAnError (args) {
-	return Promise
-		.resolve()
-		.then(() => {
-			return Promise.reject(new Error('something went wrong asynchronously'));
-		});
-}
-
-function doNothing () {
-
-}

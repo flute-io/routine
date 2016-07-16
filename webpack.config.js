@@ -2,7 +2,6 @@ const env = require('yargs').argv.mode;
 const path = require('path');
 const merge = require('webpack-merge');
 const webpack = require('webpack');
-const autoprefixer = require('autoprefixer');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const componentName = 'Routine';
@@ -38,11 +37,6 @@ const common = {
 				exclude: /(node_modules|bower_components)/
 			}
 		]
-	},
-	postcss: function () {
-		return [
-			autoprefixer
-		];
 	},
 	resolve: {
 		root: path.resolve('./src'),
