@@ -1,7 +1,7 @@
 {
   "name": "@ifyio/routine",
-  "version": "0.2.0",
-  "description": "WIP",
+  "version": "0.3.0",
+  "description": "A utility for treating your code as a sequence of operations",
   "main": "lib/render.js",
   "scripts": {
     "build": "npm run lint & webpack --mode=dev && webpack --mode=build",
