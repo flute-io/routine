@@ -46,8 +46,9 @@ export default class EnsureThat {
 			else {
 				if (!result) {
 					if (this.elseOperation) {
+						let result = this.elseOperation();
 						this.routine.abort();
-						return this.elseOperation();
+						return result;
 					}
 					else {
 						throw conditionalErrorFor(routine);
@@ -83,7 +84,6 @@ function conditionalErrorFor (routine) {
 
 function operationPreppedForExecution (operation, runnable) {
 	return (args) => {
-		runnable.routine.currentOperation = operation;
-		return operation.call(runnable.routine.scope, args);
+		return runnable.routine.invoke(operation, args);
 	};
 }
