@@ -33,8 +33,7 @@ export default class Routine {
 		}
 		else {
 			func = (arg) => {
-				this.currentOperation = operation;
-				return operation.call(this.scope, arg);
+				return this.invoke(operation, arg);
 			};
 		}
 
@@ -77,6 +76,13 @@ export default class Routine {
 
 	abort () {
 		this.aborted = true;
+	}
+
+	invoke (operation, ...args) {
+		if (!this.aborted) {
+			this.currentOperation = operation;
+			return operation.apply(this.scope, args);
+		}
 	}
 
 	run () {
