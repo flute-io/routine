@@ -8,13 +8,16 @@ export default class Routine {
 
 	handlers = {};
 
-	errorHandler = undefined;
-
 	currentOperation = undefined;
 
-	static set (scope) {
-		return new Routine(scope);
-	}
+	isSynchronous = true;
+
+	aspects = {
+		invocation: {
+			before: [],
+			after: []
+		}
+	};
 
 	constructor (scope) {
 		this.scope = scope;
@@ -24,24 +27,9 @@ export default class Routine {
 
 	addOperation (operation) {
 
-		let func;
+		Routine.validateOperation(operation);
 
-		if (isRunnable(operation)) {
-			func = () => {
-				return operation.run(this);
-			};
-		}
-		else {
-			func = (arg) => {
-				return this.invoke(operation, arg);
-			};
-		}
-
-		this.operations.push((arg)=> {
-			if (!this.aborted) {
-				return func(arg);
-			}
-		});
+		this.operations.push(operation);
 
 		return this;
 	}
@@ -56,14 +44,29 @@ export default class Routine {
 		return this;
 	}
 
-	onError (operation) {
-		this.errorHandler = operation;
+	on (eventName, operation) {
+		Routine.validateOperation(operation);
+
+		this.handlers[eventName] = (arg) => {
+			return operation.call(this.scope, arg);
+		};
 		return this;
 	}
 
-	on (eventName, operation) {
-		this.handlers[eventName] = operation;
-		return this;
+	get setup () {
+		return {
+			as (...operations) {
+				for (let operation of operations) {
+					Routine.validateOperation(operation);
+					this.invoke({
+						operation,
+						args: this,
+						respectAbort: false,
+						runAspects: false
+					});
+				}
+			}
+		};
 	}
 
 	get and () {
@@ -78,11 +81,43 @@ export default class Routine {
 		this.aborted = true;
 	}
 
-	invoke (operation, ...args) {
-		if (!this.aborted) {
-			this.currentOperation = operation;
-			return operation.apply(this.scope, args);
+	invoke ({operation, args, hasMultipleArgs = false, respectAbort = true, recordIt = true, runAspects = true} = {}) {
+
+		if (runAspects) {
+			for (let aspect of this.aspects.invocation.before) {
+				aspect({operation, args, hasMultipleArgs, respectAbort, recordIt});
+			}
 		}
+
+		if (respectAbort && this.aborted) {
+			return;
+		}
+
+		if (recordIt) {
+			this.currentOperation = operation;
+		}
+
+		let result;
+
+		if (Routine.isRunnable(operation)) {
+			result = operation.run(this);
+		}
+		else {
+			if (hasMultipleArgs) {
+				result = operation.apply(this.scope, args);
+			}
+			else {
+				result = operation.call(this.scope, args);
+			}
+		}
+
+		if (runAspects) {
+			for (let aspect of this.aspects.invocation.after) {
+				aspect({operation, args, hasMultipleArgs, respectAbort, recordIt, result});
+			}
+		}
+
+		return result;
 	}
 
 	run () {
@@ -91,9 +126,14 @@ export default class Routine {
 		try {
 			for (let i = 0; i < this.operations.length; i++) {
 				let operation = this.operations[i];
-				lastResult = operation(lastResult);
+
+				lastResult = this.invoke({
+					operation,
+					args: lastResult
+				});
 
 				if (lastResult instanceof Promise) {
+					this.isSynchronous = false;
 					const operationsToPromisify = this.operations.slice(i + 1, this.operations.length);
 					return runAsynchronously(this, operationsToPromisify, lastResult);
 				}
@@ -102,7 +142,42 @@ export default class Routine {
 			return lastResult;
 		}
 		catch (error) {
-			invokeErrorHandlerOn(this, error);
+			Routine.handleError(this, error);
+		}
+	}
+
+	static set (scope) {
+		return new Routine(scope);
+	}
+
+	static isRunnable (operation) {
+		return typeof operation === 'object' && operation.run !== undefined;
+	}
+
+	static validateOperation (operation) {
+		if (!Routine.isRunnable(operation) && typeof operation !== 'function') {
+			throw new Error('Invalid operation type - An operation has to ' +
+				'either be a function or an object with a `run()` method. Instead an operation of type ' +
+				`'${typeof operation}' was supplied.`);
+		}
+	}
+
+	static handleError (routine, error) {
+		error.$state = routine.scope.state;
+		error.$invocation = {
+			operation: routine.currentOperation.name
+		};
+
+		if (routine.handlers.error) {
+			routine.invoke({
+				operation: routine.handlers.error,
+				args: error,
+				recordIt: false,
+				respectAbort: false
+			});
+		}
+		else if (routine.isSynchronous) {
+			throw error;
 		}
 	}
 }
@@ -111,14 +186,19 @@ function runAsynchronously (routine, operations, lastResult) {
 	let promise = Promise.resolve(lastResult);
 
 	for (let operation of operations) {
-		promise = promise.then(operation);
+		promise = promise.then((args)=> {
+			return routine.invoke({
+				operation,
+				args
+			});
+		});
 	}
 
 	promise = promise.catch(error => {
 		if (routine.handlers.error) {
 			routine.abort();
 			return new Promise(resolve => {
-				invokeErrorHandlerOn(routine, error);
+				Routine.handleError(routine, error);
 				resolve();
 			});
 		}
@@ -127,19 +207,4 @@ function runAsynchronously (routine, operations, lastResult) {
 	});
 
 	return promise;
-}
-
-function invokeErrorHandlerOn (routine, error) {
-	error.$state = routine.scope.state;
-	error.$invocation = {
-		operation: routine.currentOperation.name
-	};
-
-	if (routine.handlers.error) {
-		routine.handlers.error(error);
-	}
-}
-
-function isRunnable (operation) {
-	return typeof operation === 'object' && operation.run !== undefined;
 }

@@ -84,6 +84,6 @@ function conditionalErrorFor (routine) {
 
 function operationPreppedForExecution (operation, runnable) {
 	return (args) => {
-		return runnable.routine.invoke(operation, args);
+		return runnable.routine.invoke({operation, args});
 	};
 }
