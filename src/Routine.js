@@ -1,5 +1,3 @@
-// export {ensureThat} from './EnsureThat'; // TODO: Uncomment or remove
-
 export default class Routine {
 
 	aborted = false;
@@ -12,28 +10,53 @@ export default class Routine {
 
 	isSynchronous = true;
 
+	metadata = new Map();
+
 	constructor (scope) {
 		this.scope = scope || {};
 
 		this.scope.routine = this;
 	}
 
-	addOperation (operation) {
+	addOperation (operation, instanceMetadata) {
 
 		Routine.validateOperation(operation);
+
+		this.addOperationInstanceMetadata(operation, instanceMetadata);
 
 		this.operations.push(operation);
 
 		return this;
 	}
 
-	first (operation) {
-		this.addOperation(operation);
+	addOperationInstanceMetadata (operation, instanceMetadata) {
+		if (!this.metadata.has(operation)) {
+			const metadata = {
+				instance: {},
+				static: {}
+			};
+
+			this.metadata.set(operation, metadata);
+		}
+
+		if (instanceMetadata) {
+			if (typeof instanceMetadata !== 'object') {
+				throw new Error('Instance metadata must be an object - Instance metadata was ' +
+					`specified for an operation named ${operation.name} but the instance metadata was ` +
+					`of type ${typeof operation}. Instance metadata must however be an object`);
+			}
+
+			this.metadata.get(operation).instance = instanceMetadata;
+		}
+	}
+
+	first (operation, instanceMetadata) {
+		this.addOperation(operation, instanceMetadata);
 		return this;
 	}
 
-	then (operation) {
-		this.addOperation(operation);
+	then (operation, instanceMetadata) {
+		this.addOperation(operation, instanceMetadata);
 		return this;
 	}
 
