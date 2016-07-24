@@ -1,7 +1,8 @@
 /* global describe, it, beforeEach */
 
-import Routine, {ensureThat} from '../../src/Routine';
 import {expect} from 'chai';
+import Routine from '../../src/Routine';
+import {ensureThat} from '../../src/EnsureThat';
 import {
 
 	getState,

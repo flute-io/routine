@@ -4,30 +4,18 @@ const merge = require('webpack-merge');
 const webpack = require('webpack');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const componentName = 'Routine';
 
 const common = {
-	entry: __dirname + `/src/${componentName}.js`,
+	entry: {
+		Routine: `./src/Routine.js`,
+		EnsureThat: `./src/EnsureThat.js`
+	},
 	devtool: 'source-map',
 	output: {
 		path: __dirname + '/lib',
 		library: 'routine',
 		libraryTarget: 'umd',
 		umdNamedDefine: true
-	},
-	externals: {
-		'react': {
-			root: 'React',
-			commonjs: 'react',
-			commonjs2: 'react',
-			amd: 'react'
-		},
-		'react-dom' : {
-			root: 'ReactDOM',
-			commonjs2: 'react-dom',
-			commonjs: 'react-dom',
-			amd: 'react-dom'
-		}
 	},
 	module: {
 		loaders: [
@@ -47,7 +35,7 @@ const common = {
 if(env == 'build') {
 	module.exports = merge(common, {
 		output: {
-			filename: componentName + '.min.js'
+			filename: '[name].min.js'
 		},
 		plugins: [
 			new UglifyJsPlugin({ minimize: true })
@@ -58,7 +46,7 @@ if(env == 'build') {
 if(env === 'dev') {
 	module.exports = merge(common, {
 		output: {
-			filename: componentName + '.js'
+			filename: '[name].js'
 		},
 		plugins: [
 			new CleanWebpackPlugin(['lib'])

@@ -1,4 +1,4 @@
-export {ensureThat} from './EnsureThat';
+// export {ensureThat} from './EnsureThat'; // TODO: Uncomment or remove
 
 export default class Routine {
 
@@ -12,17 +12,10 @@ export default class Routine {
 
 	isSynchronous = true;
 
-	aspects = {
-		invocation: {
-			before: [],
-			after: []
-		}
-	};
-
 	constructor (scope) {
-		this.scope = scope;
+		this.scope = scope || {};
 
-		scope.routine = this;
+		this.scope.routine = this;
 	}
 
 	addOperation (operation) {
@@ -47,10 +40,18 @@ export default class Routine {
 	on (eventName, operation) {
 		Routine.validateOperation(operation);
 
-		this.handlers[eventName] = (arg) => {
+		if (!this.handlers[eventName]) {
+			this.handlers[eventName] = [];
+		}
+
+		this.handlers[eventName].push((arg) => {
 			return operation.call(this.scope, arg);
-		};
+		});
 		return this;
+	}
+
+	use (decorator) {
+		decorator(this);
 	}
 
 	get setup () {
@@ -81,38 +82,47 @@ export default class Routine {
 		this.aborted = true;
 	}
 
-	invoke ({operation, args, hasMultipleArgs = false, respectAbort = true, recordIt = true, runAspects = true} = {}) {
+	invoke ({operation, args, hasMultipleArgs = false, respectAbort = true, recordIt = true, runHandlers = true} = {}) {
 
-		if (runAspects) {
-			for (let aspect of this.aspects.invocation.before) {
-				aspect({operation, args, hasMultipleArgs, respectAbort, recordIt});
+		const invocation = {
+			operation,
+			args,
+			hasMultipleArgs,
+			respectAbort,
+			recordIt,
+			runHandlers
+		};
+
+		if (invocation.runHandlers && this.handlers['before-invoking-operation']) {
+			for (let handle of this.handlers['before-invoking-operation']) {
+				handle(invocation);
 			}
 		}
 
-		if (respectAbort && this.aborted) {
+		if (invocation.respectAbort && this.aborted) {
 			return;
 		}
 
-		if (recordIt) {
-			this.currentOperation = operation;
+		if (invocation.recordIt) {
+			this.currentOperation = invocation.operation;
 		}
 
 		let result;
 
-		if (Routine.isRunnable(operation)) {
-			result = operation.run(this);
+		if (Routine.isRunnable(invocation.operation)) {
+			result = invocation.operation.run(this);
 		}
 		else {
-			if (hasMultipleArgs) {
-				result = operation.apply(this.scope, args);
+			if (invocation.hasMultipleArgs) {
+				result = invocation.operation.apply(this.scope, invocation.args);
 			}
 			else {
-				result = operation.call(this.scope, args);
+				result = invocation.operation.call(this.scope, invocation.args);
 			}
 		}
 
-		if (runAspects) {
-			for (let aspect of this.aspects.invocation.after) {
+		if (runHandlers && this.handlers['after-invoking-operation']) {
+			for (let aspect of this.handlers['after-invoking-operation']) {
 				aspect({operation, args, hasMultipleArgs, respectAbort, recordIt, result});
 			}
 		}
@@ -146,6 +156,23 @@ export default class Routine {
 		}
 	}
 
+	set (scope) {
+		for (let prop in scope) {
+			if (scope.hasOwnProperty(prop)) {
+				this.scope[prop] = scope;
+			}
+		}
+		return this;
+	}
+
+	static use (decorator) {
+		const routine = new Routine();
+
+		routine.use(decorator);
+
+		return routine;
+	}
+
 	static set (scope) {
 		return new Routine(scope);
 	}
@@ -163,18 +190,21 @@ export default class Routine {
 	}
 
 	static handleError (routine, error) {
+
 		error.$state = routine.scope.state;
 		error.$invocation = {
-			operation: routine.currentOperation.name
+			operation: routine.currentOperation ? routine.currentOperation.name : 'unknown operation'
 		};
 
 		if (routine.handlers.error) {
-			routine.invoke({
-				operation: routine.handlers.error,
-				args: error,
-				recordIt: false,
-				respectAbort: false
-			});
+			for (let operation of routine.handlers.error) {
+				routine.invoke({
+					operation: operation,
+					args: error,
+					recordIt: false,
+					respectAbort: false
+				});
+			}
 		}
 		else if (routine.isSynchronous) {
 			throw error;
