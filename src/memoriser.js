@@ -3,7 +3,7 @@ export default function memoriser (routine) {
 
 		const metadata = routine.metadata.get(invocation.operation);
 
-		if (metadata.instance.as) {
+		if (metadata && metadata.instance && metadata.instance.as) {
 			routine.scope[metadata.instance.as] = invocation.result;
 		}
 	});
