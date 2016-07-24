@@ -1,6 +1,6 @@
 {
   "name": "@flute-io/routine",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A utility for treating your code as a sequence of operations",
   "main": "lib/Routine.js",
   "scripts": {
