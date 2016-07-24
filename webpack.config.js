@@ -7,8 +7,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const common = {
 	entry: {
-		Routine: `./src/Routine.js`,
-		EnsureThat: `./src/EnsureThat.js`
+		Routine: './src/Routine.js',
+		injector: './src/injector.js',
+		EnsureThat: './src/EnsureThat.js'
 	},
 	devtool: 'source-map',
 	output: {
