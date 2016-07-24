@@ -23,16 +23,36 @@ describe('Routine', function () {
 		state = getState();
 	});
 
-	it('should allow for setting up a routine that consists of ordered stateful function calls', function () {
+	describe('basic usage', function () {
 
-		Routine
-			.set({state})
-			.then(addToCount(1))
-			.then(addToCount(3))
-			.then(subtractFromCount(1))
-			.run();
+		it('should allow for setting up a routine that consists of ordered stateful function calls', function () {
 
-		expect(state).to.eql({count: 3});
+			Routine
+				.set({state})
+				.then(addToCount(1))
+				.then(addToCount(3))
+				.then(subtractFromCount(1))
+				.run();
+
+			expect(state).to.eql({count: 3});
+		});
+
+		it(' should throw an error whenever a routine is passed an undefined operation', function () {
+
+			let errorThrown = false;
+
+			try {
+				Routine
+					.set({state})
+					.then(addToCount(1))
+					.then();
+			}
+			catch (error) {
+				errorThrown = true;
+			}
+
+			expect(errorThrown).to.eql(true);
+		});
 	});
 
 	describe('promise support', function () {
@@ -83,6 +103,24 @@ describe('Routine', function () {
 	});
 
 	describe('error handling', function () {
+
+		it('should throw an error whenever a synchrounous routine without an error handler fails', function () {
+			let errorThrown = false;
+
+			try {
+				Routine
+					.set({state})
+					.then(addToCount(1))
+					.then(doSomethingThatThrowsAnError)
+					.then(subtractFromCount(1))
+					.run();
+			}
+			catch (error) {
+				errorThrown = true;
+			}
+
+			expect(errorThrown).to.eql(true);
+		});
 
 		it('should support an on(`error`, ...) method that allows for setting up' +
 			'an error handler', function () {
