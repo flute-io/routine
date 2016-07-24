@@ -3,10 +3,11 @@
 import {expect} from 'chai';
 import Routine from '../../src/Routine';
 import injector from '../../src/injector';
+import withTheseInScope from '../../src/withTheseInScope';
 
-describe('Routine.use(injector)', function () {
+describe('Routine.use(withTheseInScope({some: `item`}))', function () {
 
-	it('should allow for auto-injecting operation arguments from the scope', function () {
+	it('should allow for populating the scope with the properties of a routine', function () {
 
 		const state = {
 			count: 0
@@ -14,7 +15,7 @@ describe('Routine.use(injector)', function () {
 
 		Routine
 			.use(injector)
-			.set({state})
+			.use(withTheseInScope({state}))
 			.then(addOneToStateCount)
 			.run();
 

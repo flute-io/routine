@@ -52,6 +52,7 @@ export default class Routine {
 
 	use (decorator) {
 		decorator(this);
+		return this;
 	}
 
 	get setup () {
@@ -159,7 +160,7 @@ export default class Routine {
 	set (scope) {
 		for (let prop in scope) {
 			if (scope.hasOwnProperty(prop)) {
-				this.scope[prop] = scope;
+				this.scope[prop] = scope[prop];
 			}
 		}
 		return this;
