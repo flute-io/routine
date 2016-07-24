@@ -9,7 +9,8 @@ const common = {
 	entry: {
 		Routine: './src/Routine.js',
 		injector: './src/injector.js',
-		EnsureThat: './src/EnsureThat.js'
+		EnsureThat: './src/EnsureThat.js',
+		withTheseInScope: './src/withTheseInScope.js'
 	},
 	devtool: 'source-map',
 	output: {
