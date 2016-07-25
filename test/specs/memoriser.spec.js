@@ -25,10 +25,34 @@ describe('Routine.use(withTheseInScope({some: `item`}))', function () {
 
 		expect(state).to.eql({count: 1, text: 'some text'});
 	});
+
+	it('should allow for memorising the result of an operation that returns a promise', function (done) {
+		const state = {
+			count: 0
+		};
+
+		Routine
+			.use(injector)
+			.use(memoriser)
+			.use(withTheseInScope({state}))
+			.then(getTextAsynchronously, {as: 'text'})
+			.then(addOneToStateCount)
+			.then(setTextOnState)
+			.run()
+			.then(() => {
+				expect(state).to.eql({count: 1, text: 'some asynchronous text'});
+			})
+			.then(done)
+			.catch(done);
+	});
 });
 
 function getText () {
 	return 'some text';
+}
+
+function getTextAsynchronously () {
+	return Promise.resolve('some asynchronous text');
 }
 
 function addOneToStateCount (state) {
