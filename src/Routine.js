@@ -113,7 +113,8 @@ export default class Routine {
 		hasMultipleArgs = false,
 		respectAbort = true,
 		recordIt = true,
-		runHandlers = true
+		runHandlers = true,
+		scope = this.scope
 	} = {}) {
 
 		const invocation = {
@@ -122,7 +123,8 @@ export default class Routine {
 			hasMultipleArgs,
 			respectAbort,
 			recordIt,
-			runHandlers
+			runHandlers,
+			scope
 		};
 
 		if (invocation.runHandlers && this.handlers['before-invoking-operation']) {
@@ -155,10 +157,10 @@ export default class Routine {
 		}
 		else {
 			if (invocation.hasMultipleArgs) {
-				result = invocation.operation.apply(this.scope, invocation.args);
+				result = invocation.operation.apply(invocation.scope, invocation.args);
 			}
 			else {
-				result = invocation.operation.call(this.scope, invocation.args);
+				result = invocation.operation.call(invocation.scope, invocation.args);
 			}
 		}
 
