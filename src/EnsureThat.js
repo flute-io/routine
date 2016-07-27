@@ -1,6 +1,8 @@
-export function ensureThat (operation) {
+export default function operation (operation) {
 	return new EnsureThat(operation);
 }
+
+export const ensureThat = operation;
 
 export default class EnsureThat {
 

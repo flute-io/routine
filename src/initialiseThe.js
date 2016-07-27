@@ -1,4 +1,4 @@
-export default function initialiseThe (Constructor) {
+export default function operation (Constructor) {
 	return function initialiseThe (args) {
 		return this.routine.invoke({
 			args,
@@ -7,3 +7,5 @@ export default function initialiseThe (Constructor) {
 		});
 	};
 }
+
+export const initialiseThe = operation;
