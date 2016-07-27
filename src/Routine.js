@@ -106,7 +106,15 @@ export default class Routine {
 		this.aborted = true;
 	}
 
-	invoke ({operation, args, hasMultipleArgs = false, respectAbort = true, recordIt = true, runHandlers = true} = {}) {
+	invoke ({
+		operation,
+		args,
+		isConstructor = false,
+		hasMultipleArgs = false,
+		respectAbort = true,
+		recordIt = true,
+		runHandlers = true
+	} = {}) {
 
 		const invocation = {
 			operation,
@@ -135,6 +143,15 @@ export default class Routine {
 
 		if (Routine.isRunnable(invocation.operation)) {
 			result = invocation.operation.run(this);
+		}
+		else if (isConstructor) {
+			if (invocation.hasMultipleArgs) {
+				invocation.args.unshift(null);
+				result = new (invocation.operation.bind.apply(invocation.operation, invocation.args));
+			}
+			else {
+				result = new invocation.operation(invocation.args); // eslint-disable-line new-cap
+			}
 		}
 		else {
 			if (invocation.hasMultipleArgs) {
