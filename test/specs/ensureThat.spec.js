@@ -29,7 +29,7 @@ describe('ensureThat(...)', function () {
 			let errorOccurred = false;
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(ensureThat(countIs(2)))
 				.then(addToCount(1))
@@ -48,7 +48,7 @@ describe('ensureThat(...)', function () {
 			let errorOccurred = false;
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(ensureThat(countIs(1)))
 				.then(addToCount(1))
@@ -72,7 +72,7 @@ describe('ensureThat(...)', function () {
 				let errorWasThrown = false;
 
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(addToCount(1))
 					.then(ensureThat(countIs(2)).otherwise(setCountTo(10)))
 					.then(addToCount(1))
@@ -91,7 +91,7 @@ describe('ensureThat(...)', function () {
 				let errorWasThrown = false;
 
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(addToCount(1))
 					.then(ensureThat(countIs(1)).otherwise(setCountTo(10)))
 					.then(addToCount(1))
@@ -113,7 +113,7 @@ describe('ensureThat(...)', function () {
 				let errorWasThrown = false;
 
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(asynchronouslyAddToCount(2))
 					.then(ensureThat(countIs(1)).otherwise(setCountTo(10)))
 					.then(addToCount(1))
@@ -135,7 +135,7 @@ describe('ensureThat(...)', function () {
 				let errorWasThrown = false;
 
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(asynchronouslyAddToCount(1))
 					.then(ensureThat(countIs(1)).otherwise(setCountTo(10)))
 					.then(addToCount(1))
@@ -162,7 +162,7 @@ describe('ensureThat(...)', function () {
 				let error;
 
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(asynchronouslyAddToCount(1))
 					.then(ensureThat(countIs(1)).that(countIs(2)).and.that(countIs(1)))
 					.then(addToCount(1))
@@ -186,7 +186,7 @@ describe('ensureThat(...)', function () {
 				let errorOccurred = false;
 
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(asynchronouslyAddToCount(1))
 					.then(ensureThat(countIs(1)).that(countIs(1)).and.that(countIs(1)))
 					.then(addToCount(1))
@@ -208,7 +208,7 @@ describe('ensureThat(...)', function () {
 					let error;
 
 					Routine
-						.set({state})
+						.setScopeTo({state})
 						.then(asynchronouslyAddToCount(1))
 						.then(ensureThat(countIs(1)).that(asyncCountIs(2)).and.that(countIs(1)))
 						.then(addToCount(1))
@@ -230,7 +230,7 @@ describe('ensureThat(...)', function () {
 					let errorOccurred = false;
 
 					Routine
-						.set({state})
+						.setScopeTo({state})
 						.then(asynchronouslyAddToCount(1))
 						.then(ensureThat(countIs(1)).that(asyncCountIs(1)).and.that(countIs(1)))
 						.then(addToCount(1))

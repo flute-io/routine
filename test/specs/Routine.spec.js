@@ -28,7 +28,7 @@ describe('Routine', function () {
 		it('should allow for setting up a routine that consists of ordered stateful function calls', function () {
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(addToCount(3))
 				.then(subtractFromCount(1))
@@ -43,7 +43,7 @@ describe('Routine', function () {
 
 			try {
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(addToCount(1))
 					.then();
 			}
@@ -59,7 +59,7 @@ describe('Routine', function () {
 
 		it('should also support functions that return promises alongside regular functions', function (done) {
 			const promise = Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(addToCount(3))
 				.then(asynchronouslyAddToCount(2))
@@ -76,7 +76,7 @@ describe('Routine', function () {
 		it('should support promise returning function that has been specified as ' +
 			'the last action of the routine ', function (done) {
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(addToCount(3))
 				.then(asynchronouslyAddToCount(2))
@@ -90,7 +90,7 @@ describe('Routine', function () {
 		it('should support promise returning function that has been specified as ' +
 			'the first action of the routine ', function (done) {
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(asynchronouslyAddToCount(2))
 				.then(addToCount(1))
 				.then(addToCount(3))
@@ -109,7 +109,7 @@ describe('Routine', function () {
 
 			try {
 				Routine
-					.set({state})
+					.setScopeTo({state})
 					.then(addToCount(1))
 					.then(doSomethingThatThrowsAnError)
 					.then(subtractFromCount(1))
@@ -126,7 +126,7 @@ describe('Routine', function () {
 			'an error handler', function () {
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(doSomethingThatThrowsAnError)
 				.then(subtractFromCount(1))
@@ -141,7 +141,7 @@ describe('Routine', function () {
 			'when error happens in a synchronous function', function (done) {
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(asynchronouslyAddToCount(2))
 				.then(doSomethingThatThrowsAnError)
@@ -157,7 +157,7 @@ describe('Routine', function () {
 		it('should also catch errors that happen within promises', function (done) {
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
@@ -173,7 +173,7 @@ describe('Routine', function () {
 		it('should append the state and invocation details to the error that is thrown', function (done) {
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
@@ -194,7 +194,7 @@ describe('Routine', function () {
 			'has been used to catch an error that happened within a promise', function (done) {
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)
@@ -206,7 +206,7 @@ describe('Routine', function () {
 				});
 
 			Routine
-				.set({state})
+				.setScopeTo({state})
 				.then(addToCount(1))
 				.then(asynchronouslyAddToCount(2))
 				.then(asynchronouslyDoSomethingThatThrowsAnError)

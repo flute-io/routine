@@ -14,7 +14,7 @@ describe('Routine.use(injector)', function () {
 
 		Routine
 			.use(injector)
-			.set({state})
+			.setScopeTo({state})
 			.then(addOneToStateCount)
 			.run();
 

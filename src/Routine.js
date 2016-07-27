@@ -180,7 +180,7 @@ export default class Routine {
 		}
 	}
 
-	set (scope) {
+	setScopeTo (scope) {
 		for (let prop in scope) {
 			if (scope.hasOwnProperty(prop)) {
 				this.scope[prop] = scope[prop];
@@ -197,7 +197,7 @@ export default class Routine {
 		return routine;
 	}
 
-	static set (scope) {
+	static setScopeTo (scope) {
 		return new Routine(scope);
 	}
 
