@@ -9,6 +9,7 @@ const common = {
 	entry: {
 		Routine: './src/Routine.js',
 		injector: './src/injector.js',
+		usingThe: './src/usingThe.js',
 		memoriser: './src/memoriser.js',
 		EnsureThat: './src/EnsureThat.js',
 		initialiseThe: './src/initialiseThe.js',
