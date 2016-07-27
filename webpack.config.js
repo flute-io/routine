@@ -11,6 +11,7 @@ const common = {
 		injector: './src/injector.js',
 		memoriser: './src/memoriser.js',
 		EnsureThat: './src/EnsureThat.js',
+		initialiseThe: './src/initialiseThe.js',
 		withTheseInScope: './src/withTheseInScope.js'
 	},
 	devtool: 'source-map',
