@@ -233,8 +233,8 @@ export default class Routine {
 	}
 
 	static handleError (routine, error) {
+		routine.scope.error = error;
 
-		error.$state = routine.scope.state;
 		error.$invocation = {
 			operation: routine.currentOperation ? routine.currentOperation.name : 'unknown operation'
 		};

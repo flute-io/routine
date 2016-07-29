@@ -170,7 +170,7 @@ describe('Routine', function () {
 				.run();
 		});
 
-		it('should append the state and invocation details to the error that is thrown', function (done) {
+		it('should append the invocation details to the error that is thrown', function (done) {
 
 			Routine
 				.setScopeTo({state})
@@ -180,7 +180,6 @@ describe('Routine', function () {
 				.then(subtractFromCount(1))
 				.but.on('error', (error)=> {
 					expect(error).to.be.instanceOf(Error);
-					expect(error.$state).to.eql({count: 3});
 					expect(error.$invocation).to.eql({
 						operation: 'asynchronouslyDoSomethingThatThrowsAnError'
 					});
@@ -219,6 +218,21 @@ describe('Routine', function () {
 			setTimeout(()=> {
 				done();
 			}, 500);
+		});
+
+		it('should should add the error to the scope before invoking the error handler', function () {
+			let error;
+
+			Routine
+				.setScopeTo({state})
+				.then(addToCount(1))
+				.then(doSomethingThatThrowsAnError)
+				.but.on('error', function () {
+					error = this.error;
+				})
+				.run();
+
+			expect(error, 'error was not added to the scope').to.be.instanceOf(Error);
 		});
 	});
 
