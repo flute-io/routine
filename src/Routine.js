@@ -201,7 +201,7 @@ export default class Routine {
 
 	setScopeTo (scope) {
 		for (let prop in scope) {
-			if (scope.hasOwnProperty(prop)) {
+			if (prop !== 'routine' && scope.hasOwnProperty(prop)) {
 				this.scope[prop] = scope[prop];
 			}
 		}

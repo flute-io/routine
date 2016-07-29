@@ -53,6 +53,21 @@ describe('Routine', function () {
 
 			expect(errorThrown).to.eql(true);
 		});
+
+		it('should not overwrite the routine in the scope when the scope is set', function () {
+
+			const scope = {
+				count: 0,
+				routine: 3
+			};
+
+			const routine = Routine
+				.setScopeTo(scope)
+				.then(addToCount(1));
+
+			expect(routine.scope.routine).to.equal(routine);
+
+		});
 	});
 
 	describe('promise support', function () {
