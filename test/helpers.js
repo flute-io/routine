@@ -4,6 +4,10 @@ export function getState () {
 	};
 }
 
+export function addOneToStateCount () {
+	this.state.count++;
+}
+
 export function addToCount (value) {
 	return function addToCount () {
 		this.state.count = this.state.count + value;
