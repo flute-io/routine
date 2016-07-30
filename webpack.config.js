@@ -7,6 +7,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const common = {
 	entry: {
+		ifThe: './src/ifThe.js',
 		Routine: './src/Routine.js',
 		injector: './src/injector.js',
 		usingThe: './src/usingThe.js',
