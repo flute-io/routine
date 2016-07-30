@@ -12,6 +12,8 @@ export default class Routine {
 
 	metadata = new Map();
 
+	lastConditionMet;
+
 	constructor (scope) {
 		this.scope = scope || {};
 
@@ -22,7 +24,9 @@ export default class Routine {
 
 		Routine.validateOperation(operation);
 
-		this.addOperationInstanceMetadata(operation, instanceMetadata);
+		if (instanceMetadata) {
+			this.addOperationInstanceMetadata(operation, instanceMetadata);
+		}
 
 		this.operations.push(operation);
 
@@ -57,6 +61,22 @@ export default class Routine {
 
 	then (operation, instanceMetadata) {
 		this.addOperation(operation, instanceMetadata);
+		return this;
+	}
+
+	otherwise (operation, instanceMetadata) {
+		this.addOperationInstanceMetadata(operation, instanceMetadata);
+		const _operation = (args) => {
+			if (this.lastConditionMet) {
+				this.abort();
+			}
+			else {
+				return this.invoke({operation, args});
+			}
+		};
+
+		this.addOperation(_operation);
+
 		return this;
 	}
 
