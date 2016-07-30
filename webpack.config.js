@@ -12,7 +12,7 @@ const common = {
 		injector: './src/injector.js',
 		usingThe: './src/usingThe.js',
 		memoriser: './src/memoriser.js',
-		EnsureThat: './src/EnsureThat.js',
+		ensureThat: './src/ensureThat.js',
 		initialiseThe: './src/initialiseThe.js',
 		withTheseInScope: './src/withTheseInScope.js'
 	},
