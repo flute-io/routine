@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 
 import Routine from '../../src/Routine';
+import injector from '../../src/injector';
 import {expect, assert} from 'chai';
 
 import {
@@ -271,6 +272,26 @@ describe('Routine', function () {
 				.run();
 
 			expect(result).to.eql(4);
+		});
+
+		it(' - should add decorators specified on the `@routine.use` array prop', function () {
+			
+			const scope = {
+				'@routine.use': [
+					injector
+				],
+				count: 2,
+				initialAmount: 5
+			};
+
+			const result = Routine
+				.use(scope)
+				.then(function (count, initialAmount) {
+					return count + initialAmount;
+				})
+				.run();
+
+			expect(result).to.eql(7);
 		});
 	});
 
