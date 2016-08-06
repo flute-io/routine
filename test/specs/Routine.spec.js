@@ -1,6 +1,7 @@
 /* global describe, it, beforeEach */
 
 import Routine from '../../src/Routine';
+import injector from '../../src/injector';
 import {expect, assert} from 'chai';
 
 import {
@@ -248,6 +249,49 @@ describe('Routine', function () {
 				.run();
 
 			expect(error, 'error was not added to the scope').to.be.instanceOf(Error);
+		});
+	});
+
+	describe(' - Routine.use(...)', function () {
+
+		it(' - should add objects specified on the use method to the scope', function () {
+
+			const state = {
+				count: 1
+			};
+
+			const scope = {
+				initialAmount: 3
+			};
+
+			const result = Routine
+				.use(state, scope)
+				.then(function () {
+					return this.count + this.initialAmount;
+				})
+				.run();
+
+			expect(result).to.eql(4);
+		});
+
+		it(' - should add decorators specified on the `@routine.use` array prop', function () {
+
+			const scope = {
+				'@routine.use': [
+					injector
+				],
+				count: 2,
+				initialAmount: 5
+			};
+
+			const result = Routine
+				.use(scope)
+				.then(function (count, initialAmount) {
+					return count + initialAmount;
+				})
+				.run();
+
+			expect(result).to.eql(7);
 		});
 	});
 

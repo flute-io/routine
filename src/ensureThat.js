@@ -34,7 +34,7 @@ export default class EnsureThat {
 		return this;
 	}
 
-	run (routine) {
+	run (routine, args) {
 		this.routine = routine;
 
 		for (let i = 0; i < this.operations.length; i++) {
@@ -43,14 +43,17 @@ export default class EnsureThat {
 
 			if (result instanceof Promise) {
 				const operationsToPromisify = this.operations.slice(i + 1, this.operations.length);
-				return runAsynchronously(this, operationsToPromisify, result);
+				return runAsynchronously(this, operationsToPromisify, result)
+					.then(() => {
+						return args;
+					});
 			}
 			else {
 				if (!result) {
 					if (this.elseOperation) {
-						let result = this.elseOperation();
+						this.elseOperation();
 						this.routine.abort();
-						return result;
+						return args;
 					}
 					else {
 						throw conditionalErrorFor(routine);
@@ -59,6 +62,7 @@ export default class EnsureThat {
 			}
 		}
 
+		return args;
 	}
 }
 

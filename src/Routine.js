@@ -2,17 +2,20 @@ export default class Routine {
 
 	aborted = false;
 
-	operations = [];
-
-	handlers = {};
-
-	currentOperation = undefined;
-
-	isSynchronous = true;
+	handlers = {
+		'invocation:before': [],
+		'invocation:after': []
+	};
 
 	metadata = new Map();
 
-	lastConditionMet;
+	operations = [];
+
+	isSynchronous = true;
+
+	lastConditionMet = undefined;
+
+	currentOperation = undefined;
 
 	constructor (scope) {
 		this.scope = scope || {};
@@ -24,9 +27,9 @@ export default class Routine {
 
 		Routine.validateOperation(operation);
 
-		if (instanceMetadata) {
-			this.addOperationInstanceMetadata(operation, instanceMetadata);
-		}
+		const metadata = Object.assign(operation['@routine.metadata'] || {}, instanceMetadata || {});
+
+		this.addOperationInstanceMetadata(operation, metadata);
 
 		this.operations.push(operation);
 
@@ -93,8 +96,17 @@ export default class Routine {
 		return this;
 	}
 
-	use (decorator) {
-		decorator(this);
+	use (...decorators) {
+
+		for (let decorator of decorators) {
+			if (typeof decorator === 'function') {
+				decorator(this);
+			}
+			else if (typeof decorator === 'object') {
+				this.setScopeTo(decorator);
+			}
+		}
+
 		return this;
 	}
 
@@ -147,8 +159,8 @@ export default class Routine {
 			scope
 		};
 
-		if (invocation.runHandlers && this.handlers['before-invoking-operation']) {
-			for (let handle of this.handlers['before-invoking-operation']) {
+		if (invocation.runHandlers && this.handlers['invocation:before']) {
+			for (let handle of this.handlers['invocation:before']) {
 				handle(invocation);
 			}
 		}
@@ -164,7 +176,7 @@ export default class Routine {
 		let result;
 
 		if (Routine.isRunnable(invocation.operation)) {
-			result = invocation.operation.run(this);
+			result = invocation.operation.run(this, invocation.args);
 		}
 		else if (isConstructor) {
 			if (invocation.hasMultipleArgs) {
@@ -184,8 +196,8 @@ export default class Routine {
 			}
 		}
 
-		if (runHandlers && this.handlers['after-invoking-operation']) {
-			for (let aspect of this.handlers['after-invoking-operation']) {
+		if (runHandlers && this.handlers['invocation:after']) {
+			for (let aspect of this.handlers['invocation:after']) {
 				aspect({operation, args, hasMultipleArgs, respectAbort, recordIt, result});
 			}
 		}
@@ -221,18 +233,19 @@ export default class Routine {
 
 	setScopeTo (scope) {
 		for (let prop in scope) {
-			if (prop !== 'routine' && scope.hasOwnProperty(prop)) {
+			if (prop === '@routine.use') {
+				this.use.apply(this, scope[prop]);
+			}
+			else if (prop !== 'routine' && scope.hasOwnProperty(prop)) {
 				this.scope[prop] = scope[prop];
 			}
 		}
 		return this;
 	}
 
-	static use (decorator) {
+	static use (...decorators) {
 		const routine = new Routine();
-
-		routine.use(decorator);
-
+		routine.use.apply(routine, decorators);
 		return routine;
 	}
 

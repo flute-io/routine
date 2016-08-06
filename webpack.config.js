@@ -13,7 +13,7 @@ const common = {
 		usingThe: './src/usingThe.js',
 		memoriser: './src/memoriser.js',
 		ensureThat: './src/ensureThat.js',
-		initialiseThe: './src/initialiseThe.js',
+		setupThe: './src/setupThe.js',
 		withTheseInScope: './src/withTheseInScope.js'
 	},
 	devtool: 'source-map',

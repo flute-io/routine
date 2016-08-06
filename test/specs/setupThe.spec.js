@@ -2,11 +2,11 @@
 
 import {expect} from 'chai';
 import Routine from '../../src/Routine';
+import setupThe from '../../src/setupThe';
 import injector from '../../src/injector';
 import memoriser from '../../src/memoriser';
-import initialiseThe from '../../src/initialiseThe';
 
-describe('Routine.then(initialiseThe(Constructor))', function () {
+describe('Routine.then(setupThe(Constructor))', function () {
 
 	it('should allow for initialising a constructor that accepts a single argument ' +
 		'that is in scope', function () {
@@ -21,7 +21,7 @@ describe('Routine.then(initialiseThe(Constructor))', function () {
 			.use(injector)
 			.use(memoriser)
 			.then(getTheInitialCount, {as: 'count'})
-			.then(initialiseThe(State), {as: 'state'})
+			.then(setupThe(State), {as: 'state'})
 			.then(addOneToStateCount)
 			.then(returnTheState)
 			.run();
@@ -47,12 +47,34 @@ describe('Routine.then(initialiseThe(Constructor))', function () {
 			.use(memoriser)
 			.then(getTheInitialCount, {as: 'count'})
 			.then(getTheExtraAmount, {as: 'extra'})
-			.then(initialiseThe(State), {as: 'state'})
+			.then(setupThe(State), {as: 'state'})
 			.then(addOneToStateCount)
 			.then(returnTheState)
 			.run();
 
 		expect(state).to.eql({count: 8});
+	});
+
+	it('should add the camelized name of the constructor as instance ' +
+		'metadata for the memoriser', function () {
+
+		class Counter {
+			count = 5
+		}
+
+		const count = Routine
+			.use(injector)
+			.use(memoriser)
+			.then(setupThe(Counter))
+			.then(function (counter) {
+				counter.count = counter.count + 1;
+			})
+			.then(function (counter) {
+				return counter.count;
+			})
+			.run();
+
+		expect(count).to.eql(6);
 	});
 });
 

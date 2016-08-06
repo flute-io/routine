@@ -1,6 +1,6 @@
 export default function injector (routine) {
 
-	routine.on('before-invoking-operation', (invocation) => {
+	routine.on('invocation:before', (invocation) => {
 
 		const metadata = routine.metadata.get(injector);
 		const mappings = metadata ? metadata.mappings || {} : {};

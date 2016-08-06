@@ -248,4 +248,26 @@ describe('ensureThat(...)', function () {
 			});
 		});
 	});
+
+	describe('last result handling', function () {
+
+		it('should pass the result of the prior operation on to the ' +
+			'next operation when the check passes', function () {
+
+			const state = {
+				count: 0
+			};
+
+			const result = Routine
+				.use({state})
+				.then(addToCount(1))
+				.then(ensureThat(countIs(1)))
+				.then(function addTwoToAmt (amt) {
+					return amt + 2;
+				})
+				.run();
+
+			expect(result).to.eql(3);
+		});
+	});
 });
