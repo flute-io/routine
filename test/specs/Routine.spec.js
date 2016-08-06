@@ -251,4 +251,27 @@ describe('Routine', function () {
 		});
 	});
 
+	describe(' - Routine.use(...)', function () {
+
+		it(' - should add objects specified on the use method to the scope', function () {
+
+			const state = {
+				count: 1
+			};
+
+			const scope = {
+				initialAmount: 3
+			};
+
+			const result = Routine
+				.use(state, scope)
+				.then(function () {
+					return this.count + this.initialAmount;
+				})
+				.run();
+
+			expect(result).to.eql(4);
+		});
+	});
+
 });

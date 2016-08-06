@@ -2,17 +2,17 @@ export default class Routine {
 
 	aborted = false;
 
-	operations = [];
-
 	handlers = {};
-
-	currentOperation = undefined;
-
-	isSynchronous = true;
 
 	metadata = new Map();
 
-	lastConditionMet;
+	operations = [];
+
+	isSynchronous = true;
+
+	lastConditionMet = undefined;
+
+	currentOperation = undefined;
 
 	constructor (scope) {
 		this.scope = scope || {};
@@ -93,8 +93,17 @@ export default class Routine {
 		return this;
 	}
 
-	use (decorator) {
-		decorator(this);
+	use (...decorators) {
+
+		for (let decorator of decorators) {
+			if (typeof decorator === 'function') {
+				decorator(this);
+			}
+			else if(typeof decorator === 'object') {
+				this.setScopeTo(decorator);
+			}
+		}
+
 		return this;
 	}
 
@@ -221,18 +230,19 @@ export default class Routine {
 
 	setScopeTo (scope) {
 		for (let prop in scope) {
-			if (prop !== 'routine' && scope.hasOwnProperty(prop)) {
+			if (prop === '@routine.use') {
+				this.use.apply(this, scope[prop]);
+			}
+			else if (prop !== 'routine' && scope.hasOwnProperty(prop)) {
 				this.scope[prop] = scope[prop];
 			}
 		}
 		return this;
 	}
 
-	static use (decorator) {
+	static use (...decorators) {
 		const routine = new Routine();
-
-		routine.use(decorator);
-
+		routine.use.apply(routine, decorators);
 		return routine;
 	}
 
