@@ -275,7 +275,7 @@ describe('Routine', function () {
 		});
 
 		it(' - should add decorators specified on the `@routine.use` array prop', function () {
-			
+
 			const scope = {
 				'@routine.use': [
 					injector

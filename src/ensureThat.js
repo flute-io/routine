@@ -53,7 +53,7 @@ export default class EnsureThat {
 					if (this.elseOperation) {
 						this.elseOperation();
 						this.routine.abort();
-						return args
+						return args;
 					}
 					else {
 						throw conditionalErrorFor(routine);

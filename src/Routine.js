@@ -102,7 +102,7 @@ export default class Routine {
 			if (typeof decorator === 'function') {
 				decorator(this);
 			}
-			else if(typeof decorator === 'object') {
+			else if (typeof decorator === 'object') {
 				this.setScopeTo(decorator);
 			}
 		}

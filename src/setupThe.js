@@ -1,6 +1,6 @@
 export default function operation (Constructor) {
 
-	function initialiseThe (args) {
+	function setupThe (args) {
 		return this.routine.invoke({
 			args,
 			operation: Constructor,
@@ -9,15 +9,15 @@ export default function operation (Constructor) {
 	}
 
 	if (Constructor.name) {
-		initialiseThe['@routine.metadata'] = {
+		setupThe['@routine.metadata'] = {
 			as: camelizedConstructorName(Constructor.name)
 		};
 	}
 
-	return initialiseThe;
+	return setupThe;
 }
 
-export const initialiseThe = operation;
+export const setupThe = operation;
 
 function camelizedConstructorName (name) {
 	return name.charAt(0).toLowerCase() + name.slice(1);
