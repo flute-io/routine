@@ -54,6 +54,28 @@ describe('Routine.then(initialiseThe(Constructor))', function () {
 
 		expect(state).to.eql({count: 8});
 	});
+
+	it('should add the camelized name of the constructor as instance ' +
+		'metadata for the memoriser', function () {
+
+		class Counter {
+			count = 5
+		}
+
+		const count = Routine
+			.use(injector)
+			.use(memoriser)
+			.then(initialiseThe(Counter))
+			.then(function (counter) {
+				counter.count = counter.count + 1;
+			})
+			.then(function (counter) {
+				return counter.count;
+			})
+			.run();
+
+		expect(count).to.eql(6);
+	});
 });
 
 function getTheInitialCount () {

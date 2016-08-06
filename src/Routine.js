@@ -27,9 +27,9 @@ export default class Routine {
 
 		Routine.validateOperation(operation);
 
-		if (instanceMetadata) {
-			this.addOperationInstanceMetadata(operation, instanceMetadata);
-		}
+		const metadata = Object.assign(operation['@routine.metadata'] || {}, instanceMetadata || {});
+
+		this.addOperationInstanceMetadata(operation, metadata);
 
 		this.operations.push(operation);
 
