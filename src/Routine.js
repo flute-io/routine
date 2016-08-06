@@ -176,7 +176,7 @@ export default class Routine {
 		let result;
 
 		if (Routine.isRunnable(invocation.operation)) {
-			result = invocation.operation.run(this);
+			result = invocation.operation.run(this, invocation.args);
 		}
 		else if (isConstructor) {
 			if (invocation.hasMultipleArgs) {

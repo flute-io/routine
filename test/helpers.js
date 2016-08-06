@@ -11,6 +11,7 @@ export function addOneToStateCount () {
 export function addToCount (value) {
 	return function addToCount () {
 		this.state.count = this.state.count + value;
+		return this.state.count;
 	};
 }
 
