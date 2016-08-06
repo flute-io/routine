@@ -2,7 +2,10 @@ export default class Routine {
 
 	aborted = false;
 
-	handlers = {};
+	handlers = {
+		'invocation:before': [],
+		'invocation:after': []
+	};
 
 	metadata = new Map();
 
@@ -156,8 +159,8 @@ export default class Routine {
 			scope
 		};
 
-		if (invocation.runHandlers && this.handlers['before-invoking-operation']) {
-			for (let handle of this.handlers['before-invoking-operation']) {
+		if (invocation.runHandlers && this.handlers['invocation:before']) {
+			for (let handle of this.handlers['invocation:before']) {
 				handle(invocation);
 			}
 		}
@@ -193,8 +196,8 @@ export default class Routine {
 			}
 		}
 
-		if (runHandlers && this.handlers['after-invoking-operation']) {
-			for (let aspect of this.handlers['after-invoking-operation']) {
+		if (runHandlers && this.handlers['invocation:after']) {
+			for (let aspect of this.handlers['invocation:after']) {
 				aspect({operation, args, hasMultipleArgs, respectAbort, recordIt, result});
 			}
 		}
