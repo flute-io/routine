@@ -9,6 +9,7 @@ const common = {
 	entry: {
 		ifThe: './src/ifThe.js',
 		Routine: './src/Routine.js',
+		defaults: './src/defaults',
 		injector: './src/injector.js',
 		usingThe: './src/usingThe.js',
 		memoriser: './src/memoriser.js',

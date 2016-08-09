@@ -3,6 +3,7 @@ export default class Routine {
 	aborted = false;
 
 	handlers = {
+		'run:before': [],
 		'invocation:before': [],
 		'invocation:after': []
 	};
@@ -205,7 +206,16 @@ export default class Routine {
 		return result;
 	}
 
+	emit (event, ...args) {
+		for (let handler of this.handlers[event]) {
+			handler.apply(null, args);
+		}
+	}
+
 	run () {
+
+		this.emit('run:before');
+
 		let lastResult;
 
 		try {
