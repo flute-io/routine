@@ -1,4 +1,4 @@
-export default function injector (routine) {
+export default function $injector (routine) {
 
 	routine.on('invocation:before', (invocation) => {
 
@@ -41,11 +41,13 @@ export default function injector (routine) {
 	});
 }
 
-injector.mappings = function (mappings) {
+$injector.mappings = function (mappings) {
 	return (routine) => {
 		routine.metadata.set(injector, {mappings});
 	};
 };
+
+export const injector = $injector;
 
 function $args (func) {
 	return (func + '')

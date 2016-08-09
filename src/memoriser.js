@@ -1,4 +1,4 @@
-export default function memoriser (routine) {
+export default function $memoriser (routine) {
 	routine.on('invocation:after', (invocation) => {
 
 		const metadata = routine.metadata.get(invocation.operation);
@@ -17,3 +17,5 @@ export default function memoriser (routine) {
 		}
 	});
 }
+
+export const memoriser = $memoriser;

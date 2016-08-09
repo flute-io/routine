@@ -2,7 +2,7 @@
 
 import {expect} from 'chai';
 import Routine from '../../src/Routine';
-import {ensureThat} from '../../src/ensureThat';
+import ensureThat from '../../src/ensureThat';
 import {
 
 	getState,
