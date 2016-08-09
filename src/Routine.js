@@ -91,9 +91,8 @@ export default class Routine {
 			this.handlers[eventName] = [];
 		}
 
-		this.handlers[eventName].push((arg) => {
-			return operation.call(this.scope, arg);
-		});
+		this.handlers[eventName].push(operation);
+
 		return this;
 	}
 
