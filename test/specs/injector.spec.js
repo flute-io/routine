@@ -3,6 +3,7 @@
 import {expect} from 'chai';
 import Routine from '../../src/Routine';
 import injector from '../../src/injector';
+import {doSomethingThatThrowsAnError} from '../helpers';
 
 describe('Routine.use(injector)', function () {
 
@@ -21,7 +22,7 @@ describe('Routine.use(injector)', function () {
 		expect(state).to.eql({count: 1});
 	});
 
-	it('should allow for specifying mappings that the injector ' +
+	it(' - should allow for specifying mappings that the injector ' +
 		'can use to resolve dependencies', function () {
 
 		const state = {
@@ -39,6 +40,24 @@ describe('Routine.use(injector)', function () {
 			.run();
 
 		expect(state).to.eql({count: 5, amount: 3});
+	});
+
+	it(' - should inject the error handler', function () {
+
+		const state = {
+			count: 2
+		};
+
+		Routine
+			.use(injector)
+			.setScopeTo({state})
+			.then(doSomethingThatThrowsAnError)
+			.and.on('error', function (error, state) { // eslint-disable-line  handle-callback-err
+				state.count++;
+			})
+			.run();
+
+		expect(state).to.eql({count: 3});
 	});
 });
 
