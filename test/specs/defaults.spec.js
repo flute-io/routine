@@ -3,7 +3,7 @@
 import {expect} from 'chai';
 import Routine from '../../src/Routine';
 import injector from '../../src/injector';
-import {defaults} from '../../src/defaults';
+import defaults from '../../src/defaults';
 import memoriser from '../../src/memoriser';
 
 describe('Routine.use(defaults({...})', function () {

@@ -1,10 +1,10 @@
-export default function operation (operation) {
+export default function $ensureThat (operation) {
 	return new EnsureThat(operation);
 }
 
-export const ensureThat = operation;
+export const ensureThat = $ensureThat;
 
-export default class EnsureThat {
+export class EnsureThat {
 
 	scope = {};
 

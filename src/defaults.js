@@ -1,4 +1,4 @@
-export function defaults (mapping) {
+export default function $defaults (mapping) {
 
 	return function defaults (routine) {
 
@@ -16,6 +16,8 @@ export function defaults (mapping) {
 		});
 	};
 }
+
+export const defaults = $defaults;
 
 function definitionOf (scope, mapping, prop) {
 

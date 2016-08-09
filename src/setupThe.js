@@ -1,4 +1,4 @@
-export default function operation (Constructor) {
+export default function $setupThe (Constructor) {
 
 	function setupThe (args) {
 		return this.routine.invoke({
@@ -17,7 +17,7 @@ export default function operation (Constructor) {
 	return setupThe;
 }
 
-export const setupThe = operation;
+export const setupThe = $setupThe;
 
 function camelizedConstructorName (name) {
 	return name.charAt(0).toLowerCase() + name.slice(1);

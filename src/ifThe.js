@@ -1,4 +1,4 @@
-export default function operation (condition) {
+export default function $ifThe (condition) {
 
 	function runner (operation) {
 
@@ -21,7 +21,7 @@ export default function operation (condition) {
 	return runner;
 }
 
-export const ifThe = operation;
+export const ifThe = $ifThe;
 
 export class IfThe {
 	constructor (condition) {

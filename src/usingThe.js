@@ -1,4 +1,4 @@
-export default function operation (objectInScope) {
+export default function $usingThe (objectInScope) {
 	return (methodToInvoke) => {
 		return function usingThe (args) {
 			const obj = this.routine.scope[objectInScope];
@@ -25,4 +25,4 @@ export default function operation (objectInScope) {
 	};
 }
 
-export const usingThe = operation;
+export const usingThe = $usingThe;
