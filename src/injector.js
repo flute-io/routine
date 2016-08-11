@@ -4,12 +4,12 @@ export default function $injector (routine) {
 
 		const metadata = routine.metadata.get(injector);
 		const mappings = metadata ? metadata.mappings || {} : {};
-		const argNames = $args(invocation.operation);
-		const argsToInject = [];
+		const depNames = $args(invocation.operation);
+		const depsToInject = [];
 
-		for (let argName of argNames) {
+		for (let argName of depNames) {
 			if (argName === 'routine') {
-				argsToInject.push(routine);
+				depsToInject.push(routine);
 			}
 			else if (mappings[argName]) {
 				const arg = getItemFromObjByStringPath({
@@ -24,18 +24,21 @@ export default function $injector (routine) {
 						`named '${invocation.operation.name}' does not exist in scope`);
 				}
 
-				argsToInject.push(arg);
+				depsToInject.push(arg);
 			}
 			else if (routine.scope[argName]) {
-				argsToInject.push(routine.scope[argName]);
+				depsToInject.push(routine.scope[argName]);
+			}
+			else {
+				depsToInject.push(invocation.args);
 			}
 		}
 
-		if (argsToInject.length === 1) {
-			invocation.args = argsToInject[0];
+		if (depsToInject.length === 1) {
+			invocation.args = depsToInject[0];
 		}
-		else if (argsToInject.length > 1) {
-			invocation.args = argsToInject;
+		else if (depsToInject.length > 1) {
+			invocation.args = depsToInject;
 			invocation.hasMultipleArgs = true;
 		}
 	});

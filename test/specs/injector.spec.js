@@ -59,7 +59,31 @@ describe('Routine.use(injector)', function () {
 
 		expect(state).to.eql({count: 3});
 	});
+
+	it(' - should supply the default args for dependencies that have not been found', function () {
+
+		const scope = {
+			firstValue: 1,
+			secondValue: 2,
+			thirdValue: 3
+		};
+
+		const result = Routine
+			.use(injector)
+			.use(scope)
+			.then(getTheValueTen)
+			.then(function (thirdValue, value, secondValue, firstValue) {
+				return firstValue + value + secondValue + thirdValue;
+			})
+			.run();
+
+		expect(result).to.eql(16);
+	});
 });
+
+function getTheValueTen () {
+	return 10;
+}
 
 function addOneToStateCount (state) {
 	state.count++;
