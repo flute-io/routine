@@ -152,6 +152,7 @@ export default class Routine {
 		const invocation = {
 			operation,
 			args,
+			isConstructor,
 			hasMultipleArgs,
 			respectAbort,
 			recordIt,
